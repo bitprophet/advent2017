@@ -1,4 +1,7 @@
-def captcha(seq):
+def captcha_next(seq):
+    """
+    First captcha which checks digits against the next digit in sequence.
+    """
     matches = []
     for i, digit in enumerate(seq):
         try:
