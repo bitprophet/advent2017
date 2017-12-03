@@ -1,7 +1,18 @@
-from advent.day3 import spiral_steps
+from advent.day3 import spiral_steps, build_grid
 
 
 personal_input = 347991
+
+
+class build_grid_:
+    def example(self):
+        assert build_grid(including=23) == [
+            17, 16, 15, 14, 13,
+            18, 5,  4,  3,  12,
+            19, 6,  1,  2,  11,
+            20, 7,  8,  9,  10,
+            21, 22, 23, 24, 25,
+        ]
 
 
 class spiral_steps_:
