@@ -1,4 +1,4 @@
-from advent.day2 import checksum
+from advent.day2 import checksum, evenly_divisible_checksum
 
 
 personal_input = """
@@ -32,3 +32,16 @@ class checksum_:
 
     def solution(self):
         assert checksum(personal_input) == 45972
+
+
+class evenly_divisible_checksum_:
+    def example(self):
+        sheet = """
+5 9 2 8
+9 4 7 3
+3 8 6 5
+"""
+        assert evenly_divisible_checksum(sheet) == 9
+
+    def solution(self):
+        assert evenly_divisible_checksum(personal_input) == 326
