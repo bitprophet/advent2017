@@ -1,4 +1,4 @@
-from advent.day1 import captcha_next
+from advent.day1 import captcha_next, captcha_opposite
 
 # From http://adventofcode.com/2017/day/1/input, logged in as me via GH
 personal_captcha_input = """
@@ -21,3 +21,23 @@ class captcha_next_:
 
     def solution(self):
         assert captcha_next(personal_captcha_input) == 1390
+
+
+class captcha_opposite_:
+    def simple(self):
+        assert captcha_opposite("1212") == 6
+
+    def no_matches(self):
+        assert captcha_opposite("1221") == 0
+
+    def only_one_match(self):
+        assert captcha_opposite("123425") == 4
+
+    def repeated(self):
+        assert captcha_opposite("123123") == 12
+
+    def mixed(self):
+        assert captcha_opposite("12131415") == 4
+
+    def solution(self):
+        assert captcha_opposite(personal_captcha_input) == 1232
