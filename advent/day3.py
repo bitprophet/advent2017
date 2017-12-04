@@ -22,21 +22,30 @@ class Grid:
         ]
         # Other bookkeeping
         self.spiraling = cycle(Spiral)
+        # Identify where the center is; the spiral-drawing algo doesn't
+        # currently need it (tho if it changed to be in->out, it would) but
+        # steps-to-center computation does.
+        self.halfway = self.side // 2
 
     def display(self):
         print(tabulate(self.grid, tablefmt='grid'))
 
-    def fill(self):
-        # Walk the spiral backwards, filling in from bottom right. Easier than
-        # the other way 'round!
+    def walk(self):
+        # Walk the spiral backwards from bottom right. Easier than the other
+        # way 'round!
         self.x = self.y = self.side - 1
-        current = self.end
-        self.grid[self.y][self.x] = current
         self.heading = next(self.spiraling)
-        while current > 1:
+        while self.x != self.halfway or self.y != self.halfway:
+            yield self.x, self.y
             self.move()
-            current -= 1
+            self.display()
+
+    def fill(self):
+        current = self.end
+        for x, y in self.walk():
             self.write(current)
+            current -= 1
+        self.write(current)
 
     def write(self, number):
         self.grid[self.y][self.x] = number
@@ -73,6 +82,13 @@ class Grid:
         self.y = new_y
 
     def steps_to_center(self):
+        # TODO: eureka! could simply cut out some of fill() - as soon as we
+        # write(number==self.including) we are capable of answering this
+        # particular question about the grid!
+
+        # 'Move' the coords to the actual number in question (self.including)
+        # Then simply get the absolute difference between those coords and
+        # self.halfway, and sum them.
         pass
 
 
