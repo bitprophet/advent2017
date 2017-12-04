@@ -20,8 +20,6 @@ class Grid:
             [None for y in range(self.side)]
             for x in range(self.side)
         ]
-        # Other bookkeeping
-        self.spiraling = cycle(Spiral)
         # Identify where the center is; the spiral-drawing algo doesn't
         # currently need it (tho if it changed to be in->out, it would) but
         # steps-to-center computation does.
@@ -34,11 +32,14 @@ class Grid:
         # Walk the spiral backwards from bottom right. Easier than the other
         # way 'round!
         self.x = self.y = self.side - 1
+        # Initialize spiraling here to proof against being walk()'d multiple
+        # times - the end direction will not necessarily match the start
+        # direction!
+        self.spiraling = cycle(Spiral)
         self.heading = next(self.spiraling)
         while self.x != self.halfway or self.y != self.halfway:
             yield self.x, self.y
             self.move()
-            self.display()
 
     def fill(self):
         current = self.end
@@ -50,13 +51,26 @@ class Grid:
     def write(self, number):
         self.grid[self.y][self.x] = number
 
-    def is_empty(self, x, y):
+    def read(self):
+        return self.grid[self.y][self.x]
+
+    def should_turn(self, x, y):
         try:
-            return self.grid[y][x] is None
+            lookahead = self.grid[y][x]
+            if lookahead is None:
+                # If next cell exists & is None, keep going, we're in a fill
+                # action presumably and it can be filled next.
+                return False
+            else:
+                # Non-None (and clearly not an IndexError) means it's some
+                # already-filled number, and we can tell whether to spiral
+                # inwards if the 'next' number in this direction is larger than
+                # the one currently pointed to (presuming we are walking
+                # largest->smallest.)
+                next_bigger = lookahead > self.read()
+                return next_bigger
         except IndexError: # implies x or y was < 0
-            # TODO: this doesn't quite fit the question of "is empty", so
-            # either rename the method (lol) or rethink
-            return False
+            return True
 
     def turn(self):
         self.heading = next(self.spiraling)
@@ -74,7 +88,7 @@ class Grid:
             new_y += 1
         # If the next cell in this heading wouldn't be valid, spiral & try
         # moving again, without actually updating coords.
-        if not self.is_empty(new_x, new_y):
+        if self.should_turn(new_x, new_y):
             self.turn()
             return self.move()
         # Otherwise, must be safe to move, so punch in those coords.
@@ -87,10 +101,19 @@ class Grid:
         # particular question about the grid!
 
         # 'Move' the coords to the actual number in question (self.including)
+        for x, y in self.walk():
+            value = self.read()
+            print("Walking: ({}, {}) -> {}".format(x, y, value))
+            if value is self.including:
+                break
+        self.display()
+        print("({}, {})".format(x, y))
         # Then simply get the absolute difference between those coords and
         # self.halfway, and sum them.
-        pass
+        return abs(x - self.halfway) + abs(y - self.halfway)
 
 
 def spiral_steps(square):
-    return Grid(including=square).steps_to_center()
+    grid = Grid(including=square)
+    grid.fill()
+    return grid.steps_to_center()
